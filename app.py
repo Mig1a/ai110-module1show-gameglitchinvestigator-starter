@@ -92,8 +92,16 @@ low, high = get_range_for_difficulty(difficulty)
 st.sidebar.caption(f"Range: {low} to {high}")
 st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 
-if "secret" not in st.session_state:
+if "difficulty" not in st.session_state:
+    st.session_state.difficulty = difficulty
+
+if "secret" not in st.session_state or st.session_state.difficulty != difficulty:  # FIXME: Logic breaks here | FIX: Secret wasn't regenerated on difficulty change so Easy could have a secret up to 1000; Claude added difficulty tracking to force a new secret when it changes
     st.session_state.secret = random.randint(low, high)
+    st.session_state.difficulty = difficulty
+    st.session_state.attempts = 0
+    st.session_state.score = 0
+    st.session_state.status = "playing"
+    st.session_state.history = []
 
 if "attempts" not in st.session_state:
     st.session_state.attempts = 0  # FIXME: Logic breaks here | FIX: Was initialized to 1, skipping the first attempt count; Claude changed to 0
